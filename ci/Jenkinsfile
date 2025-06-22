@@ -1,0 +1,44 @@
+
+pipeline {
+    agent any
+
+    environment {
+        GRADLE_OPTS = "-Dorg.gradle.jvmargs='-Xmx1024m'"
+    }
+
+    tools {
+        gradle 'Gradle_8'
+        jdk 'jdk-17'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/edwardrod/RappyPayRest.git'
+            }
+        }
+
+        stage('Clean') {
+            steps {
+                sh './gradlew clean'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh './gradlew test aggregate'
+            }
+        }
+
+        stage('Publish Serenity Report') {
+            steps {
+                publishHTML (target: [
+                    reportDir: 'build/reports/serenity',
+                    reportFiles: 'index.html',
+                    reportName: 'Serenity Report',
+                    keepAll: true
+                ])
+            }
+        }
+    }
+}
