@@ -1,7 +1,8 @@
 package stepdefinitions;
 
 import in.request.questions.ResponseCode;
-import in.request.questions.ValidateShazamResponseStructure;
+import in.request.questions.ValidateResponseHeaders;
+import in.request.questions.ValidateShazamSongByIdResponse;
 import in.request.tasks.GetSongDetails;
 import in.request.tasks.PostSong;
 import io.cucumber.java.Before;
@@ -14,28 +15,26 @@ import net.serenitybdd.screenplay.actors.OnlineCast;
 import net.serenitybdd.screenplay.rest.abilities.CallAnApi;
 
 import static net.serenitybdd.screenplay.GivenWhenThen.seeThat;
-import static net.serenitybdd.screenplay.actors.OnStage.theActorCalled;
 import static org.hamcrest.Matchers.equalTo;
 
 public class ShazamApiStepDefinitions {
 
-    Actor actor = OnStage.theActorCalled("Eduar");
+    private Actor actor;
 
 
     @Before
     public void setTheStage() {
         OnStage.setTheStage(new OnlineCast());
-        theActorCalled("Eduar").whoCan(CallAnApi.at("https://shazam.p.rapidapi.com"));
+        actor = OnStage.theActorCalled("Eduar")
+                .whoCan(CallAnApi.at("https://shazam.p.rapidapi.com"));
     }
 
-    @When("el usuario consulta los detalles de la cancion con ID {string}")
+    @When("el usuario consulta los detalles de la canción con ID {string}")
     public void consultarCancionPorId(String id) {
         actor.attemptsTo(GetSongDetails.byId(id));
-
-
     }
 
-    @When("el usuario envia el texto {string} para deteccion")
+    @When("el usuario envía el texto {string} para detección")
     public void detectarCancion(String path) {
         actor.attemptsTo(PostSong.using(path));
     }
@@ -47,10 +46,18 @@ public class ShazamApiStepDefinitions {
         );
     }
 
+    @And("la respuesta debe tener la estructura")
+    public void laRespuestaDebeTenerLaEstructura() {
+        OnStage.theActorInTheSpotlight().should(
+                seeThat("la estructura de respuesta", ValidateShazamSongByIdResponse.isValid())
+        );
+    }
+
+
     @And("la respuesta debe tener la estructura esperada")
     public void laRespuestaDebeTenerLaEstructuraEsperada() {
         actor.should(
-                seeThat("la estructura de respuesta", ValidateShazamResponseStructure.isValid())
+                seeThat("la estructura de respuesta", ValidateResponseHeaders.areValid())
         );
     }
 }

@@ -5,6 +5,7 @@ import net.serenitybdd.screenplay.Actor;
 import net.serenitybdd.screenplay.Task;
 import net.serenitybdd.screenplay.Tasks;
 import net.serenitybdd.screenplay.rest.interactions.Get;
+import net.serenitybdd.screenplay.rest.interactions.Post;
 
 public class PostSong implements Task {
 
@@ -23,13 +24,11 @@ public class PostSong implements Task {
         String textoPlano = TextFileReader.from(filePath);
 
         actor.attemptsTo(
-                Get.resource("/songs/v2/get-details")
+                Post.to("/songs/detect")
                         .with(request -> request
-                                .queryParam("timezone", "America%2FChicago")
-                                .queryParam("locale", "en-US")
-                                .header("X-Rapidapi-Key", "a954888aa4mshcac6a6db889161cp143e4ajsnaba7813dd2d4")
-                                .header("X-Rapidapi-Host", "shazam.p.rapidapi.com")
-                                .header("Content-Type", "application/json")
+                                .header("x-rapidapi-key", "a954888aa4mshcac6a6db889161cp143e4ajsnaba7813dd2d4")
+                                .header("x-rapidapi-host", "shazam.p.rapidapi.com")
+                                .header("Content-Type", "text/plain")
                                 .body(textoPlano)
                         )
         );
