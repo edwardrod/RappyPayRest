@@ -94,6 +94,9 @@ Headers requeridos:
 
 ---
 
+## 🧪 Integración Continua con Jenkins
+Este proyecto está preparado para ejecutarse en un pipeline de Jenkins utilizando el siguiente Jenkinsfile
+
 ## ✅ Validaciones realizadas
 
 - Validación del código de estado HTTP
