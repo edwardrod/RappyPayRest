@@ -1,19 +1,67 @@
-plugins {
-    id 'java'
-}
-
-group = 'org.example'
+group = 'in.reqrest'
 version = '1.0-SNAPSHOT'
+
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: "net.serenity-bdd.serenity-gradle-plugin"
+
+buildscript {
+    repositories {
+        mavenCentral()
+        mavenLocal()
+        maven {url "https://plugins.gradle.org/m2/"}
+    }
+    ext {
+        serenityVersion = '4.1.14'
+        cucumberVersion = '7.15.0'
+    }
+    dependencies {
+        classpath("net.serenity-bdd:serenity-gradle-plugin:$rootProject.ext.serenityVersion")
+    }
+}
 
 repositories {
     mavenCentral()
 }
 
+compileJava {
+    sourceCompatibility = 17
+    targetCompatibility = 17
+}
+
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation "net.serenity-bdd:serenity-core:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-junit:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-screenplay:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-screenplay-rest:$rootProject.ext.serenityVersion"
+    implementation "net.serenity-bdd:serenity-cucumber:$rootProject.ext.serenityVersion"
+    testImplementation "io.cucumber:cucumber-core:$rootProject.ext.cucumberVersion"
+    testImplementation "io.cucumber:cucumber-junit:$rootProject.ext.cucumberVersion"
+
+    implementation 'junit:junit:4.13.1'
+    implementation 'org.assertj:assertj-core:3.24.0'
+    implementation 'org.slf4j:slf4j-simple:2.0.5'
+    implementation 'org.slf4j:slf4j-api:2.0.5'
+    implementation 'org.apache.logging.log4j:log4j-core:2.20.0'
+    implementation 'org.reflections:reflections:0.10.2'
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
 }
 
 test {
-    useJUnitPlatform()
+    useJUnit {
+        gradle.startParameter.continueOnFailure = true
+        testLogging.showStandardStreams = true
+        systemProperties System.getProperties()
+        systemProperty "cucumber.filter.tags", System.getProperty("cucumber.filter.tags")
+        if (!System.properties.containsKey('environment')) {
+            System.setProperty('environment', 'dev')
+        }
+    }
 }
+
+test.finalizedBy(aggregate)
